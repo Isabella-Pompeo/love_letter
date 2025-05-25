@@ -35,37 +35,31 @@ $(window).resize(function () {
 })(jQuery);
 
 function timeElapse(date) {
-	
-	var current = new Date();
+    var current = new Date();
+
+    // Usa apenas a data para contar os dias completos
     var utc1 = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
     var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
     var days = Math.floor((utc1 - utc2) / (1000 * 60 * 60 * 24));
 
-	var seconds = (Date.parse(current) - Date.parse(date)) / 1000;
-	var days = Math.floor(seconds / (3600 * 24));
-	seconds = seconds % (3600 * 24);
-	var hours = Math.floor(seconds / 3600);
-	if (hours < 10) {
-		hours = '0' + hours;
-	}
-	seconds = seconds % 3600;
-	var minutes = Math.floor(seconds / 60);
-	if (minutes < 10) {
-		minutes = '0' + minutes;
-	}
-	seconds = seconds % 60;
-	if (seconds < 10) {
-		seconds = '0' + seconds;
-	}
-	var result =
-		'Day <span class="digit">' +
-		days +
-		'</span>, <span class="digit">' +
-		hours +
-		'</span> hrs, <span class="digit">' +
-		minutes +
-		'</span> min, <span class="digit">' +
-		seconds +
-		'</span> sec';
-	$('#clock').html(result);
+    // Agora calcula as horas/minutos/segundos
+    var diff = current.getTime() - date.getTime();
+    var seconds = Math.floor(diff / 1000);
+    var hours = Math.floor((seconds % (3600 * 24)) / 3600);
+    var minutes = Math.floor((seconds % 3600) / 60);
+    var secs = seconds % 60;
+
+    // Formata para 2 dígitos
+    hours = hours < 10 ? "0" + hours : hours;
+    minutes = minutes < 10 ? "0" + minutes : minutes;
+    secs = secs < 10 ? "0" + secs : secs;
+
+    var result =
+        'Day <span class="digit">' + days +
+        '</span>, <span class="digit">' + hours +
+        '</span> hrs, <span class="digit">' + minutes +
+        '</span> min, <span class="digit">' + secs +
+        '</span> sec';
+
+    $('#clock').html(result);
 }
