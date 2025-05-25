@@ -37,12 +37,17 @@ $(window).resize(function () {
 function timeElapse(date) {
     var current = new Date();
 
-    // Usa apenas a data para contar os dias completos
-    var utc1 = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
-    var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
-    var days = Math.floor((utc1 - utc2) / (1000 * 60 * 60 * 24));
+    // Define a data de início com base no horário local
+    var start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    var end = new Date(current.getFullYear(), current.getMonth(), current.getDate());
 
-    // Agora calcula as horas/minutos/segundos
+    // Calcula a diferença em milissegundos
+    var timeDiff = end - start;
+
+    // Converte a diferença para dias
+    var days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+    // Calcula a diferença exata de horas, minutos e segundos
     var diff = current.getTime() - date.getTime();
     var seconds = Math.floor(diff / 1000);
     var hours = Math.floor((seconds % (3600 * 24)) / 3600);
@@ -55,11 +60,11 @@ function timeElapse(date) {
     secs = secs < 10 ? "0" + secs : secs;
 
     var result =
-        'Day <span class="digit">' + days +
+        'Dia <span class="digit">' + days +
         '</span>, <span class="digit">' + hours +
         '</span> hrs, <span class="digit">' + minutes +
         '</span> min, <span class="digit">' + secs +
-        '</span> sec';
+        '</span> seg';
 
     $('#clock').html(result);
 }
