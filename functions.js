@@ -35,7 +35,12 @@ $(window).resize(function () {
 })(jQuery);
 
 function timeElapse(date) {
-	var current = Date();
+	
+	var current = new Date();
+    var utc1 = Date.UTC(current.getFullYear(), current.getMonth(), current.getDate());
+    var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    var days = Math.floor((utc1 - utc2) / (1000 * 60 * 60 * 24));
+
 	var seconds = (Date.parse(current) - Date.parse(date)) / 1000;
 	var days = Math.floor(seconds / (3600 * 24));
 	seconds = seconds % (3600 * 24);
