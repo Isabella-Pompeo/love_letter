@@ -1,28 +1,138 @@
 <!DOCTYPE html>
-<html lang="pt-br" >
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Letter Animation</title>
-  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css'><link rel="stylesheet" href="./style.css">
-
+  <meta charset="UTF-8" />
+  <title>Árvore de Corações</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: radial-gradient(circle, #111 0%, #000 100%);
+    }
+    canvas {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-<h3 class="fixed">Click the letters!</h3>
-<div class="word">
-	<span>A</span>
-	<span>L</span>
-	<span>E</span>
-	<span>X</span>
-	<span>D</span>
-	<span>E</span>
-	<span>V</span>
-</div>
- <!-- 
-Inspired by:
-    *Ig alexx_deev
-    * Instagram: https://www.instagram.com/alexx_deev?igsh=a3IyMnY0ZjdnZjJ0 
-    * https://www.instagram.com/alexx_deev?igsh=a3IyMnY0ZjdnZjJ0   
--->
-  <script  src="./script.js"></script>
+<canvas id="canvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  resizeCanvas();
+
+  window.addEventListener('resize', resizeCanvas);
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  const heartColors = ['#ff69b4', '#ff1493', '#ff4d4d', '#fff0f5', '#ffa07a', '#ffb6c1', '#ffffff'];
+  const treeHearts = [];
+  const fallingHearts = [];
+
+  // Corações da árvore (crescimento)
+  const treeHeartCount = 300;
+  let treeGrowth = 0;
+
+  // Corações flutuando
+  function createFallingHeart() {
+    return {
+      x: Math.random() * canvas.width,
+      y: -20,
+      size: Math.random() * 0.5 + 0.3,
+      speed: Math.random() * 0.5 + 0.3,
+      color: heartColors[Math.floor(Math.random() * heartColors.length)],
+      drift: (Math.random() - 0.5) * 0.5
+    };
+  }
+
+  for (let i = 0; i < 50; i++) {
+    fallingHearts.push(createFallingHeart());
+  }
+
+  function generateTreeHearts() {
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const scale = 100;
+
+    for (let i = 0; i < treeHeartCount; i++) {
+      const t = Math.random() * Math.PI;
+      const r = Math.random();
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+
+      treeHearts.push({
+        x: cx + x * scale * r,
+        y: cy + y * scale * r,
+        size: Math.random() * 0.6 + 0.4,
+        color: heartColors[Math.floor(Math.random() * heartColors.length)],
+        delay: Math.random() * 1.5
+      });
+    }
+  }
+
+  function drawHeart(x, y, size, color, shadow = true) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(size, size);
+    ctx.rotate(Math.PI);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.bezierCurveTo(0, -0.5, -0.5, -0.5, -0.5, 0);
+    ctx.bezierCurveTo(-0.5, 0.3, 0, 0.6, 0, 1);
+    ctx.bezierCurveTo(0, 0.6, 0.5, 0.3, 0.5, 0);
+    ctx.bezierCurveTo(0.5, -0.5, 0, -0.5, 0, 0);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    if (shadow) {
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 10;
+    }
+    ctx.fill();
+    ctx.restore();
+  }
+
+  generateTreeHearts();
+
+  function animate(time) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Tronco da árvore
+    const trunkWidth = 20;
+    const trunkHeight = 120;
+    ctx.fillStyle = "#502d16";
+    ctx.fillRect(canvas.width / 2 - trunkWidth / 2, canvas.height / 2, trunkWidth, trunkHeight);
+
+    // Corações da árvore crescendo
+    treeGrowth += 0.01;
+    treeHearts.forEach(h => {
+      if (treeGrowth > h.delay) {
+        drawHeart(h.x, h.y, h.size, h.color);
+      }
+    });
+
+    // Corações flutuantes
+    fallingHearts.forEach(h => {
+      h.y += h.speed;
+      h.x += h.drift;
+      drawHeart(h.x, h.y, h.size, h.color, false);
+    });
+
+    // Reposicionar corações que saíram da tela
+    for (let i = 0; i < fallingHearts.length; i++) {
+      if (fallingHearts[i].y > canvas.height + 20) {
+        fallingHearts[i] = createFallingHeart();
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+</script>
 </body>
 </html>
