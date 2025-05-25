@@ -35,36 +35,28 @@ $(window).resize(function () {
 })(jQuery);
 
 function timeElapse(date) {
-    var current = new Date();
+    const now = new Date();
 
-    // Define a data de início com base no horário local
-    var start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    var end = new Date(current.getFullYear(), current.getMonth(), current.getDate());
+    // Define ambas as datas para meia-noite (ignora horas, minutos, etc.)
+    const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const current = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    // Calcula a diferença em milissegundos
-    var timeDiff = end - start;
+    // Cálculo correto da diferença em dias completos
+    const diffTime = current.getTime() - start.getTime();
+    const days = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    // Converte a diferença para dias
-    var days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    // Agora calcula a diferença em tempo para mostrar horas, minutos e segundos
+    const fullDiff = now.getTime() - date.getTime();
+    let seconds = Math.floor(fullDiff / 1000);
+    const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+    seconds %= 3600;
+    const minutes = Math.floor(seconds / 60);
+    seconds %= 60;
 
-    // Calcula a diferença exata de horas, minutos e segundos
-    var diff = current.getTime() - date.getTime();
-    var seconds = Math.floor(diff / 1000);
-    var hours = Math.floor((seconds % (3600 * 24)) / 3600);
-    var minutes = Math.floor((seconds % 3600) / 60);
-    var secs = seconds % 60;
+    // Formatação
+    const pad = (n) => (n < 10 ? '0' + n : n);
 
-    // Formata para 2 dígitos
-    hours = hours < 10 ? "0" + hours : hours;
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    secs = secs < 10 ? "0" + secs : secs;
-
-    var result =
-        'Dia <span class="digit">' + days +
-        '</span>, <span class="digit">' + hours +
-        '</span> hrs, <span class="digit">' + minutes +
-        '</span> min, <span class="digit">' + secs +
-        '</span> seg';
+    const result = `Day <span class="digit">${days}</span>, <span class="digit">${pad(hours)}</span> hrs, <span class="digit">${pad(minutes)}</span> min, <span class="digit">${pad(seconds)}</span> sec`;
 
     $('#clock').html(result);
 }
